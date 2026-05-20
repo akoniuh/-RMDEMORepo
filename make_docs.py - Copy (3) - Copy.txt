@@ -1,0 +1,41 @@
+import os
+from pathlib import Path
+from datetime import datetime
+
+# ---------- НАСТРОЙКИ ----------
+folder = Path("output_docs")     # папка для файлов
+count = 500                      # сколько файлов создать
+prefix = "doc_"                  # префикс имени файла
+extension = ".txt"               # расширение
+pad_width = len(str(count))      # ширина нумерации, например 3 для 500 -> 001..500
+overwrite = False                # True = перезаписывать существующие файлы
+# --------------------------------
+
+folder.mkdir(parents=True, exist_ok=True)
+
+now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+created = 0
+skipped = 0
+
+for i in range(1, count + 1):
+    name = f"{prefix}{str(i).zfill(pad_width)}{extension}"
+    path = folder / name
+
+    if path.exists() and not overwrite:
+        skipped += 1
+        continue
+
+    content = (
+        f"Файл: {name}\n"
+        f"Создан: {now}\n\n"
+        f"Содержимое: Это автоматически созданный текстовый документ №{i}.\n"
+        "Добавьте сюда любой текст — шаблон можно поменять в скрипте.\n"
+    )
+
+    try:
+        path.write_text(content, encoding="utf-8")
+        created += 1
+    except Exception as e:
+        print(f"Ошибка при записи {path}: {e}")
+
+print(f"Готово. Создано: {created}. Пропущено (существовали): {skipped}. Папка: {folder.resolve()}")
